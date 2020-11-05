@@ -2,12 +2,12 @@
 <template>
   <el-container class="contation-home">
     <!-- 左侧导航 -->
-    <el-aside width="200px" class="my-aside">
+    <el-aside :width="isOpen?'200px':'64px'" class="my-aside">
       <div class="logo">
-        <img src="../../assets/images/home-logo.png" alt="">
+        <img :src="isOpen?'/img/home-logo.f2e4560f.png':'/img/min-home-logo.f6ba3fb3.png'" alt="">
       </div>
 
-      <el-menu default-active="1" class="el-menu-vertical-demo" background-color="#333333" style="border-right:none" text-color="#fff" active-text-color="#ffd04b">
+      <el-menu default-active="1" class="el-menu-vertical-demo" :collapse="!isOpen" :collapse-transition="false" background-color="#333333" style="border-right:none" text-color="#fff" active-text-color="#ffd04b">
         <el-menu-item index="1">
           <i class="el-icon-s-home"></i>
           <span slot="title">首页</span>
@@ -43,7 +43,7 @@
     <el-container>
       <!-- 头部导航 -->
       <el-header class="my-header">
-        <span class="icon el-icon-s-fold"></span>
+        <span class="icon el-icon-s-fold" @click="toggleMent()"></span>
         <span class="text">优贝口腔</span>
         <el-dropdown class="my-dropdown">
           <span class="el-dropdown-link">
@@ -77,6 +77,7 @@ export default {
   data () {
     // 这里存放数据
     return {
+      isOpen: true
     }
   },
   // 监听属性 类似于data概念
@@ -85,6 +86,10 @@ export default {
   watch: {},
   // 方法集合
   methods: {
+    toggleMent () {
+      // 点击切换状态
+      this.isOpen = !this.isOpen
+    }
 
   },
   // 生命周期 - 创建完成（可以访问当前this实例）

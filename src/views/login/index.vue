@@ -11,7 +11,7 @@
         </el-form-item>
 
         <el-form-item prop="code">
-          <el-input v-model="loginForm.code" placeholder="请输入验证码" style="width:240px;margin-right:8px"></el-input>
+          <el-input v-model="loginForm.code" placeholder="请输入验证码" style="width:239px;margin-right:8px"></el-input>
           <el-button>获取验证码</el-button>
         </el-form-item>
 
@@ -120,7 +120,6 @@ export default {
   left: 0;
   .my-card {
     width: 400px;
-    height: 350px;
     position: absolute;
     top: 50%;
     left: 50%;
