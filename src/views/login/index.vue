@@ -29,6 +29,8 @@
 </template>
 
 <script>
+import auth from '@/utils/auth'
+// import auth from '@/utils/auth'
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
 
@@ -82,6 +84,8 @@ export default {
           this.$http.post('http://ttapi.research.itcast.cn/mp/v1_0/authorizations', this.loginForm).then(res => {
             // 登陆成功跳转到首页
             this.$router.push('/')
+            auth.setUser(res.data.data)
+            // console.log(res)
           }).catch(() => {
             // 错误消息提示
             this.$message({ showClose: true, message: '手机号输入有误', type: 'error' })

@@ -4,7 +4,8 @@
     <!-- 左侧导航 -->
     <el-aside :width="isOpen?'200px':'64px'" class="my-aside">
       <div class="logo">
-        <img :src="isOpen?'/img/home-logo.f2e4560f.png':'/img/min-home-logo.f6ba3fb3.png'" alt="">
+        <img src="../../assets/images/home-logo.png" :class="{hide:!isOpen}" alt="">
+        <img src="../../assets/images/min-home-logo.png" :class="{hide:isOpen}" alt="">
       </div>
 
       <el-menu default-active="1" class="el-menu-vertical-demo" :collapse="!isOpen" :collapse-transition="false" background-color="#333333" style="border-right:none" text-color="#fff" active-text-color="#ffd04b">
@@ -45,15 +46,15 @@
       <el-header class="my-header">
         <span class="icon el-icon-s-fold" @click="toggleMent()"></span>
         <span class="text">优贝口腔</span>
-        <el-dropdown class="my-dropdown">
+        <el-dropdown class="my-dropdown" @command="headerClick">
           <span class="el-dropdown-link">
-            <img class="header" src="../../assets/images/user_top.jpg" alt="">
-            <strong class="name">张三</strong>
+            <img class="header" :src="user_info.photo" alt="">
+            <strong class="name">{{user_info.name}}</strong>
             <i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>个人设置</el-dropdown-item>
-            <el-dropdown-item>退出登录</el-dropdown-item>
+            <el-dropdown-item command="setting">个人设置</el-dropdown-item>
+            <el-dropdown-item command="logout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </el-header>
@@ -69,7 +70,7 @@
 <script>
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
-
+import auth from '@/utils/auth'
 export default {
   name: 'home',
   // import引入的组件需要注入到对象中才能使用
@@ -77,7 +78,12 @@ export default {
   data () {
     // 这里存放数据
     return {
-      isOpen: true
+      isOpen: true,
+      user_info: {
+        name: '',
+        photo: ''
+      }
+
     }
   },
   // 监听属性 类似于data概念
@@ -89,16 +95,25 @@ export default {
     toggleMent () {
       // 点击切换状态
       this.isOpen = !this.isOpen
+    },
+    headerClick (command) {
+      if (command === 'setting') {
+        return this.$router.push('/setting')
+      }
+      if (command === 'logout') {
+        auth.removeUser()
+        this.$router.push('/login')
+      }
     }
-
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created () {
-
+    const user = auth.getUser()
+    this.user_info.name = user.name
+    this.user_info.photo = user.photo
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted () {
-
   },
   beforeCreate () { }, // 生命周期 - 创建之前
   beforeMount () { }, // 生命周期 - 挂载之前
@@ -127,6 +142,9 @@ export default {
         display: block;
         width: 80%;
         margin: 0 auto;
+      }
+      .hide {
+        display: none;
       }
     }
   }

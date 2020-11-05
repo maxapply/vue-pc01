@@ -4,6 +4,11 @@ import VueRouter from 'vue-router'
 import Login from '@/views/login'
 import Home from '@/views/home'
 import Welcome from '@/views/welcome'
+import NotFound from '@/views/notfound'
+import Article from '@/views/article'
+
+// 获取本地用户信息
+import auth from '@/utils/auth'
 Vue.use(VueRouter)
 
 const routes = [
@@ -14,17 +19,32 @@ const routes = [
       {
         path: '/',
         component: Welcome
+      },
+      {
+        path: '/article',
+        component: Article
       }
     ]
   },
   {
     path: '/login',
     component: Login
+  },
+  // 404页面
+  {
+    path: '*',
+    component: NotFound
   }
 ]
 
 const router = new VueRouter({
   routes
+})
+
+// 路由前置守卫
+router.beforeEach((to, from, next) => {
+  if (to.path !== '/login' && !auth.getUser().token) return next('/login')
+  next()
 })
 
 export default router
