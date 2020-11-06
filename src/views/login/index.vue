@@ -79,17 +79,18 @@ export default {
 
     submitForm (loginForm) {
       // 点击登录验证
-      this.$refs[loginForm].validate((valid) => {
+      this.$refs[loginForm].validate(async (valid) => {
         if (valid) {
-          this.$http.post('authorizations', this.loginForm).then(res => {
+          try {
+            const res = await this.$http.post('authorizations', this.loginForm)
+            // 本地存储用户 信息
             auth.setUser(res.data.data)
-            // 登陆成功跳转到首页
+            // 登录成功跳转到首页
             this.$router.push('/')
-            // console.log(res)
-          }).catch(() => {
-            // 错误消息提示
-            this.$message({ showClose: true, message: '手机号输入有误', type: 'error' })
-          })
+          } catch (err) {
+            // 输出错误提示信息
+            console.log(err)
+          }
         }
       })
     }
