@@ -81,10 +81,10 @@ export default {
       // 点击登录验证
       this.$refs[loginForm].validate((valid) => {
         if (valid) {
-          this.$http.post('http://ttapi.research.itcast.cn/mp/v1_0/authorizations', this.loginForm).then(res => {
+          this.$http.post('authorizations', this.loginForm).then(res => {
+            auth.setUser(res.data.data)
             // 登陆成功跳转到首页
             this.$router.push('/')
-            auth.setUser(res.data.data)
             // console.log(res)
           }).catch(() => {
             // 错误消息提示

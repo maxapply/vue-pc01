@@ -44,6 +44,8 @@ const router = new VueRouter({
 // 路由前置守卫
 router.beforeEach((to, from, next) => {
   if (to.path !== '/login' && !auth.getUser().token) return next('/login')
+  // if (to.path !== '/login') return next('/login')
+  // if (!auth.getUser().token) return next('/login')
   next()
 })
 
