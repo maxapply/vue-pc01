@@ -68,7 +68,7 @@
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button type="primary" icon="el-icon-edit" @click="toEditicle(scope.row.id)" circle plain></el-button>
-            <el-button type="danger" icon="el-icon-delete" circle plain></el-button>
+            <el-button type="danger" icon="el-icon-delete" @click="delArticle(scope.row.id)" circle plain></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -162,6 +162,23 @@ export default {
     // 跳转到编辑文章
     toEditicle (id) {
       this.$router.push(`/publish?id=${id}`)
+    },
+    // 删除文章
+    delArticle (id) {
+      this.$confirm('您是否确认要删除该片文章, 是否继续?', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        try {
+          await this.$http.delete(`articles/${id}`)
+          this.$message.success('删除成功')
+          this.getArticle()
+        } catch (e) {
+          this.$message.error('删除失败')
+        }
+      }).catch(() => {
+      })
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
