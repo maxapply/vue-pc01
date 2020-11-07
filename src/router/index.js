@@ -7,6 +7,7 @@ import Welcome from '@/views/welcome'
 import NotFound from '@/views/notfound'
 import Article from '@/views/article'
 import Publish from '@/views/publish'
+import Images from '@/views/image'
 
 // 获取本地用户信息
 import auth from '@/utils/auth'
@@ -28,6 +29,10 @@ const routes = [
       {
         path: '/publish',
         component: Publish
+      },
+      {
+        path: '/images',
+        component: Images
       }
     ]
   },
