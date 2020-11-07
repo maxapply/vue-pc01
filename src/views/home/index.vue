@@ -166,6 +166,7 @@ export default {
       width: 50px;
       height: 50px;
       vertical-align: middle;
+      margin-right: 20px;
     }
     .namer {
       margin-left: 5px;

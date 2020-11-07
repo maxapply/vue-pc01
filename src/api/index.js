@@ -1,6 +1,7 @@
 import axios from 'axios'
 import auth from '@/utils/auth'
 import router from '@/router'
+import JSONBig from 'json-bigint' // json-bigint 处理最大安全数值插件
 
 // 设置基准地址
 axios.defaults.baseURL = 'http://ttapi.research.itcast.cn/mp/v1_0/'
@@ -28,5 +29,15 @@ axios.interceptors.response.use(function (response) {
   if (error.response && error.response.status === 401) router.push('/login')
   return Promise.reject(error)
 })
+
+// 处理 js 最大安全数值
+axios.defaults.transformResponse = [function (data) {
+  // 对 data 进行任意转换处理
+  try {
+    return JSONBig.parse(data)
+  } catch (e) {
+    return data
+  }
+}]
 
 export default axios
