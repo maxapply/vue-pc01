@@ -6,6 +6,7 @@ import Home from '@/views/home'
 import Welcome from '@/views/welcome'
 import NotFound from '@/views/notfound'
 import Article from '@/views/article'
+import Publish from '@/views/publish'
 
 // 获取本地用户信息
 import auth from '@/utils/auth'
@@ -23,6 +24,10 @@ const routes = [
       {
         path: '/article',
         component: Article
+      },
+      {
+        path: '/publish',
+        component: Publish
       }
     ]
   },

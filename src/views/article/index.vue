@@ -22,25 +22,25 @@
         </el-form-item>
 
         <el-form-item label="频道 : ">
-          <el-select v-model="filterData.channel_id" placeholder="请选择">
+          <el-select clearable @change="changeChannel" v-model="filterData.channel_id" placeholder="请选择">
             <el-option v-for="item in channelOptions" :key="item.id" :label="item.name" :value="item.id">
             </el-option>
           </el-select>
         </el-form-item>
 
         <el-form-item label="日期 : ">
-          <el-date-picker v-model="dataArr" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
+          <el-date-picker value-format="yyyy-MM-dd" @change="changeDate" v-model="dataArr" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
           </el-date-picker>
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" @click="onSubmit">筛选</el-button>
+          <el-button type="primary" @click="search">筛选</el-button>
         </el-form-item>
       </el-form>
     </el-card>
     <!-- 结果区域 -->
     <el-card style="margin-top:20px">
-      <div slot="header">根据筛选条件查询到 {{this.artNum}} 条结果：</div>
+      <div slot="header">根据筛选条件查询到 {{this.total}} 条结果：</div>
 
       <el-table :data="articles">
         <el-table-column label="封面" prop="date">
@@ -66,12 +66,14 @@
         <el-table-column label="发布时间" prop="pubdate">
         </el-table-column>
         <el-table-column label="操作">
-          <el-button type="primary" icon="el-icon-edit" circle plain></el-button>
-          <el-button type="danger" icon="el-icon-delete" circle plain></el-button>
+          <template slot-scope="scope">
+            <el-button type="primary" icon="el-icon-edit" @click="toEditicle(scope.row.id)" circle plain></el-button>
+            <el-button type="danger" icon="el-icon-delete" circle plain></el-button>
+          </template>
         </el-table-column>
       </el-table>
       <!-- 分页 -->
-      <el-pagination style="margin-top:20px" background layout="prev, pager, next" :total="this.artNum"></el-pagination>
+      <el-pagination style="margin-top:20px" @current-change="changePage" background layout="prev, pager, next" :page-size="filterData.per_page" :current-page="filterData.page" :total="total"></el-pagination>
     </el-card>
   </div>
 </template>
@@ -93,8 +95,7 @@ export default {
         begin_pubdate: '', // 起始日期
         end_pubdate: '', // 结束日期
         page: 1, // 页数
-        per_page: 20, // 每页数量
-        response_type: ''
+        per_page: 10 // 每页数量
       },
       // 频道 数据
       channelOptions: [],
@@ -103,7 +104,7 @@ export default {
       // 文章 列表 数据
       articles: [],
       // 文章总数
-      artNum: null
+      total: null
     }
   },
   // 监听属性 类似于data概念
@@ -112,8 +113,10 @@ export default {
   watch: {},
   // 方法集合
   methods: {
-    onSubmit () {
-
+    // 点击筛选
+    search () {
+      this.filterData.page = 1
+      this.getArticle()
     },
     // 获取 频道 信息
     async getChennelOptionts () {
@@ -127,13 +130,38 @@ export default {
     // 获取文章列表信息
     async getArticle () {
       try {
-        const res = await this.$http.get('articles', { paromise: this.filterData })
+        const res = await this.$http.get('articles', { params: this.filterData })
         this.articles = res.data.data.results
-        console.log(res)
-        this.artNum = res.data.data.total_count
+        // 设置总条数
+        this.total = res.data.data.total_count
       } catch (e) {
         console.log(e)
       }
+    },
+    // 分页 切换
+    changePage (e) {
+      this.filterData.page = e
+      this.getArticle() // 获取 文章 列表信息
+    },
+    // 日期改变
+    changeDate (dataArr) {
+      if (dataArr) {
+        this.filterData.begin_pubdate = dataArr[0]
+        this.filterData.end_pubdate = dataArr[1]
+      } else {
+        this.filterData.begin_pubdate = null
+        this.filterData.end_pubdate = null
+      }
+    },
+    // 监控频道列表清空
+    changeChannel () {
+      if (this.filterData.channel_id === '') {
+        this.filterData.channel_id = null
+      }
+    },
+    // 跳转到编辑文章
+    toEditicle (id) {
+      this.$router.push(`/publish?id=${id}`)
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
