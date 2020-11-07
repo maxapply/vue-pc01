@@ -15,7 +15,16 @@
           <el-radio-button :label="true">收藏</el-radio-button>
         </el-radio-group>
 
-        <el-button type="success" style="float:right" size="small">添加素材</el-button>
+        <el-button type="success" style="float:right" size="small" @click="openDialog">添加素材</el-button>
+
+        <!-- 对话框 -->
+        <el-dialog title="添加素材" :visible.sync="dialogVisible" width="300px">
+          <el-upload class="avatar-uploader" action="http://ttapi.research.itcast.cn/mp/v1_0/user/images" name="image" :headers="upLoadHeaders" :show-file-list="false" :on-success="handleSuccess">
+            <img v-if="imageUrl" :src="imageUrl" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+
+        </el-dialog>
       </div>
 
       <!-- 列表 -->
@@ -24,7 +33,7 @@
           <img :src="item.url" alt="">
           <div class="option" v-show="!reqParams.collect">
             <span class="el-icon-star-off" :class="{red:item.is_collected}" @click="totalStatus(item)"></span>
-            <span class="el-icon-delete"></span>
+            <span class="el-icon-delete" @click="delImage(item.id)"></span>
           </div>
         </div>
       </div>
@@ -39,7 +48,7 @@
 <script>
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》'
-
+import auth from '@/utils/auth'
 export default {
   namr: 'app-image',
   // import引入的组件需要注入到对象中才能使用
@@ -53,7 +62,12 @@ export default {
         per_page: 15
       },
       total: 0, // 总条数
-      images: [] // 图片素材
+      images: [], // 图片素材
+      dialogVisible: false, // 显隐对话框
+      imageUrl: '', // 图片
+      upLoadHeaders: {
+        Authorization: `Bearer ${auth.getUser().token}`
+      } // 图片上传的请求头
     }
   },
   // 监听属性 类似于data概念
@@ -94,6 +108,45 @@ export default {
         this.$message.error('操作失败')
         console.log(e)
       }
+    },
+    // 删除图片
+    delImage (id) {
+      this.$confirm('此操作将永久删除该图片, 是否继续?', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        try {
+          await this.$http.delete(`user/images/${id}`)
+          this.getImages()
+          this.$message.success('删除成功')
+        } catch (e) {
+          this.$message.erroe('删除失败')
+        }
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
+    // 添加素材
+    openDialog () {
+      this.imageUrl = ''
+      this.dialogVisible = true
+    },
+    // 上传成功
+    handleSuccess (res, file) {
+      this.$message.success('上传成功')
+      this.imageUrl = res.data.url
+      window.setTimeout(() => {
+        this.dialogVisible = false
+        this.getImages()
+      }, 2000)
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
