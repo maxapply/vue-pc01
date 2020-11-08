@@ -26,7 +26,7 @@
           </el-radio-group>
 
           <div>
-            <my-image></my-image>
+            <my-image @input="articleFrom.iamge = $event"></my-image>
             <my-image></my-image>
             <my-image></my-image>
           </div>
@@ -71,7 +71,8 @@ export default {
         cover: {
           type: 1,
           images: []
-        }
+        },
+        iamge: ''
       },
       editorOption: {
         placeholder: '',

@@ -8,32 +8,33 @@
         <my-bread>素材管理</my-bread>
       </div>
 
-      <!-- 按钮 -->
-      <div class="btn-box">
-        <el-radio-group @change="changeCollect" v-model="reqParams.collect" size="small" style="margin-bottom: 20px;">
-          <el-radio-button :label="false">全部</el-radio-button>
-          <el-radio-button :label="true">收藏</el-radio-button>
-        </el-radio-group>
+      <div v-loading="loading">
+        <!-- 按钮 -->
+        <div class="btn-box">
+          <el-radio-group @change="changeCollect" v-model="reqParams.collect" size="small" style="margin-bottom: 20px;">
+            <el-radio-button :label="false">全部</el-radio-button>
+            <el-radio-button :label="true">收藏</el-radio-button>
+          </el-radio-group>
 
-        <el-button type="success" style="float:right" size="small" @click="openDialog">添加素材</el-button>
+          <el-button type="success" style="float:right" size="small" @click="openDialog">添加素材</el-button>
 
-        <!-- 对话框 -->
-        <el-dialog title="添加素材" :visible.sync="dialogVisible" width="300px">
-          <el-upload class="avatar-uploader" action="http://ttapi.research.itcast.cn/mp/v1_0/user/images" name="image" :headers="upLoadHeaders" :show-file-list="false" :on-success="handleSuccess">
-            <img v-if="imageUrl" :src="imageUrl" class="avatar">
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-          </el-upload>
+          <!-- 对话框 -->
+          <el-dialog title="添加素材" :visible.sync="dialogVisible" width="300px">
+            <el-upload class="avatar-uploader" action="http://ttapi.research.itcast.cn/mp/v1_0/user/images" name="image" :headers="upLoadHeaders" :show-file-list="false" :on-success="handleSuccess">
+              <img v-if="imageUrl" :src="imageUrl" class="avatar">
+              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            </el-upload>
+          </el-dialog>
+        </div>
 
-        </el-dialog>
-      </div>
-
-      <!-- 列表 -->
-      <div class="img-list">
-        <div class="img-item" v-for="item in images" :key="item.id">
-          <img :src="item.url" alt="">
-          <div class="option" v-show="!reqParams.collect">
-            <span class="el-icon-star-off" :class="{red:item.is_collected}" @click="totalStatus(item)"></span>
-            <span class="el-icon-delete" @click="delImage(item.id)"></span>
+        <!-- 列表 -->
+        <div class="img-list">
+          <div class="img-item" v-for="item in images" :key="item.id">
+            <img :src="item.url" alt="">
+            <div class="option" v-show="!reqParams.collect">
+              <span class="el-icon-star-off" :class="{red:item.is_collected}" @click="totalStatus(item)"></span>
+              <span class="el-icon-delete" @click="delImage(item.id)"></span>
+            </div>
           </div>
         </div>
       </div>
@@ -67,7 +68,8 @@ export default {
       imageUrl: '', // 图片
       upLoadHeaders: {
         Authorization: `Bearer ${auth.getUser().token}`
-      } // 图片上传的请求头
+      }, // 图片上传的请求头
+      loading: false // loading加载
     }
   },
   // 监听属性 类似于data概念
@@ -78,9 +80,11 @@ export default {
   methods: {
     // 获取图片素材
     async getImages () {
+      this.loading = true
       const res = await this.$http.get('user/images', { params: this.reqParams })
       this.images = res.data.data.results
       this.total = res.data.data.total_count
+      this.loading = false
     },
     // 页码 改变 获取对应内容
     imageChange (e) {
@@ -94,7 +98,6 @@ export default {
     },
     // 切换收藏
     async totalStatus (item) {
-      console.log(item)
       try {
         const res = await this.$http.put(`/user/images/${item.id}`, { collect: !item.is_collected })
         this.$message.success(res.data.data.collect ? '添加成功' : '取消成功')

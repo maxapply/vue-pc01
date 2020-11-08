@@ -36,43 +36,46 @@
         </el-form-item>
       </el-form>
     </el-card>
-    <!-- 结果区域 -->
-    <el-card style="margin-top:20px">
-      <div slot="header">根据筛选条件查询到 {{this.total}} 条结果：</div>
+    <div v-loading="loading">
+      <!-- 结果区域 -->
+      <el-card style="margin-top:20px">
+        <div slot="header">根据筛选条件查询到 {{this.total}} 条结果：</div>
 
-      <el-table :data="articles">
-        <el-table-column label="封面" prop="date">
-          <template slot-scope="scope">
-            <el-image :src="scope.row.cover.images[0]" style="width:200px;height:130px">
-              <div slot="error">
-                <img class="articleList" src="../../assets/images/notImg.png" alt="" style="width:200px;height:130px">
-              </div>
-            </el-image>
-          </template>
-        </el-table-column>
-        <el-table-column label="标题" prop="title">
-        </el-table-column>
-        <el-table-column label="状态" prop="status">
-          <template slot-scope="scope">
-            <el-button v-show="scope.row.status===0" size="mini" type="info" plain>草稿</el-button>
-            <el-button v-show="scope.row.status===1" size="mini" plain>待审核</el-button>
-            <el-button v-show="scope.row.status===2" size="mini" type="success" plain>审核通过</el-button>
-            <el-button v-show="scope.row.status===3" size="mini" type="warning" plain>审核失败</el-button>
-            <el-button v-show="scope.row.status===4" size="mini" type="danger" plain>已删除</el-button>
-          </template>
-        </el-table-column>
-        <el-table-column label="发布时间" prop="pubdate">
-        </el-table-column>
-        <el-table-column label="操作">
-          <template slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" @click="toEditicle(scope.row.id)" circle plain></el-button>
-            <el-button type="danger" icon="el-icon-delete" @click="delArticle(scope.row.id)" circle plain></el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <!-- 分页 -->
-      <el-pagination style="margin-top:20px" @current-change="changePage" background layout="prev, pager, next" :page-size="filterData.per_page" :current-page="filterData.page" :total="total"></el-pagination>
-    </el-card>
+        <el-table :data="articles">
+          <el-table-column label="封面" prop="date">
+            <template slot-scope="scope">
+              <el-image :src="scope.row.cover.images[0]" style="width:200px;height:130px">
+                <div slot="error">
+                  <img class="articleList" src="../../assets/images/notImg.png" alt="" style="width:200px;height:130px">
+                </div>
+              </el-image>
+            </template>
+          </el-table-column>
+          <el-table-column label="标题" prop="title">
+          </el-table-column>
+          <el-table-column label="状态" prop="status">
+            <template slot-scope="scope">
+              <el-button v-show="scope.row.status===0" size="mini" type="info" plain>草稿</el-button>
+              <el-button v-show="scope.row.status===1" size="mini" plain>待审核</el-button>
+              <el-button v-show="scope.row.status===2" size="mini" type="success" plain>审核通过</el-button>
+              <el-button v-show="scope.row.status===3" size="mini" type="warning" plain>审核失败</el-button>
+              <el-button v-show="scope.row.status===4" size="mini" type="danger" plain>已删除</el-button>
+            </template>
+          </el-table-column>
+          <el-table-column label="发布时间" prop="pubdate">
+          </el-table-column>
+          <el-table-column label="操作">
+            <template slot-scope="scope">
+              <el-button type="primary" icon="el-icon-edit" @click="toEditicle(scope.row.id)" circle plain></el-button>
+              <el-button type="danger" icon="el-icon-delete" @click="delArticle(scope.row.id)" circle plain></el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <!-- 分页 -->
+        <el-pagination style="margin-top:20px" @current-change="changePage" background layout="prev, pager, next" :page-size="filterData.per_page" :current-page="filterData.page" :total="total"></el-pagination>
+      </el-card>
+    </div>
+
   </div>
 </template>
 
@@ -94,7 +97,8 @@ export default {
         begin_pubdate: '', // 起始日期
         end_pubdate: '', // 结束日期
         page: 1, // 页数
-        per_page: 10 // 每页数量
+        per_page: 10, // 每页数量
+        loading: false // loading加载效果
       },
       // 频道 数据
       channelOptions: [],
@@ -121,10 +125,12 @@ export default {
     // 获取文章列表信息
     async getArticle () {
       try {
+        this.loading = true
         const res = await this.$http.get('articles', { params: this.filterData })
         this.articles = res.data.data.results
         // 设置总条数
         this.total = res.data.data.total_count
+        this.loading = false
       } catch (e) {
         console.log(e)
       }
