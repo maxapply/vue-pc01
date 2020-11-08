@@ -22,10 +22,8 @@
         </el-form-item>
 
         <el-form-item label="频道 : ">
-          <el-select clearable @change="changeChannel" v-model="filterData.channel_id" placeholder="请选择">
-            <el-option v-for="item in channelOptions" :key="item.id" :label="item.name" :value="item.id">
-            </el-option>
-          </el-select>
+          <!-- 自己封装的频道组件 -->
+          <my-channel :value="filterData.channel_id" @input="filterData.channel_id=$event"></my-channel>
         </el-form-item>
 
         <el-form-item label="日期 : ">
@@ -79,6 +77,7 @@
 </template>
 
 <script>
+
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》'
 export default {
@@ -118,15 +117,7 @@ export default {
       this.filterData.page = 1
       this.getArticle()
     },
-    // 获取 频道 信息
-    async getChennelOptionts () {
-      try {
-        const res = await this.$http.get('channels')
-        this.channelOptions = res.data.data.channels
-      } catch (e) {
-        console.log(e)
-      }
-    },
+
     // 获取文章列表信息
     async getArticle () {
       try {
@@ -154,11 +145,11 @@ export default {
       }
     },
     // 监控频道列表清空
-    changeChannel () {
-      if (this.filterData.channel_id === '') {
-        this.filterData.channel_id = null
-      }
-    },
+    // changeChannel () {
+    //   if (this.filterData.channel_id === '') {
+    //     this.filterData.channel_id = null
+    //   }
+    // },
     // 跳转到编辑文章
     toEditicle (id) {
       this.$router.push(`/publish?id=${id}`)
@@ -183,7 +174,6 @@ export default {
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created () {
-    this.getChennelOptionts() // 获取 频道信息
     this.getArticle() // 获取 文章 列表信息
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）

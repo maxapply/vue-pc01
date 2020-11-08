@@ -58,7 +58,7 @@ export default {
     return {
       reqParams: {
         collect: false, // 全部与收藏
-        paeg: 1,
+        page: 1,
         per_page: 15
       },
       total: 0, // 总条数
@@ -78,30 +78,25 @@ export default {
   methods: {
     // 获取图片素材
     async getImages () {
-      try {
-        const res = await this.$http.get('user/images', { params: this.reqParams })
-        this.images = res.data.data.results
-        this.total = res.data.data.total_count
-      } catch (e) {
-        console.log(e)
-      }
+      const res = await this.$http.get('user/images', { params: this.reqParams })
+      this.images = res.data.data.results
+      this.total = res.data.data.total_count
     },
     // 页码 改变 获取对应内容
     imageChange (e) {
-      this.reqParams.paeg = e
+      this.reqParams.page = e
       this.getImages() // 获取图片素材
     },
     // 全部 与 收藏的切换
     changeCollect () {
-      this.reqParams.paeg = 1
+      this.reqParams.page = 1
       this.getImages() // 获取图片素材
     },
     // 切换收藏
     async totalStatus (item) {
+      console.log(item)
       try {
         const res = await this.$http.put(`/user/images/${item.id}`, { collect: !item.is_collected })
-        // this.getImages()
-        // this.$message.success('操作成功')
         this.$message.success(res.data.data.collect ? '添加成功' : '取消成功')
         item.is_collected = res.data.data.collect
       } catch (e) {
