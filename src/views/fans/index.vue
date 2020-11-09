@@ -9,7 +9,7 @@
       </div>
 
       <el-tabs v-model="activeName" type="card">
-        <el-tab-pane label="粉丝列表" name="list">
+        <el-tab-pane label="粉丝列表" name="list" v-loading="loading">
           <div class="fansList">
             <div class="fans_item" v-for="item in fansList" :key="Number(item.id)">
               <el-avatar :src="item.photo" :size="80"></el-avatar>
@@ -23,7 +23,6 @@
 
         <el-tab-pane label="粉丝画像" name="pictrue">
           <div style="width:600px;height:400px" ref="dom"></div>
-
         </el-tab-pane>
       </el-tabs>
 
@@ -48,7 +47,8 @@ export default {
       reqParams: {
         page: 1,
         per_page: 30
-      }
+      },
+      loading: false
 
     }
   },
@@ -59,9 +59,11 @@ export default {
   // 方法集合
   methods: {
     async getFans () {
+      this.loading = true
       const res = await this.$http.get('followers', { params: this.reqParams })
       this.fansList = res.data.data.results
       this.total = res.data.data.total_count
+      this.loading = false
     },
     // 切换分页
     changePage (e) {
