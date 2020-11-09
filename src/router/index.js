@@ -9,6 +9,8 @@ import Article from '@/views/article'
 import Publish from '@/views/publish'
 import Images from '@/views/image'
 import Comment from '@/views/comment'
+import Fans from '@/views/fans'
+import Setting from '@/views/setting'
 
 // 获取本地用户信息
 import auth from '@/utils/auth'
@@ -38,6 +40,14 @@ const routes = [
       {
         path: '/comment',
         component: Comment
+      },
+      {
+        path: '/fans',
+        component: Fans
+      },
+      {
+        path: '/setting',
+        component: Setting
       }
     ]
   },
