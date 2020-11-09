@@ -5,7 +5,7 @@
       <!-- 面包屑组件 -->
       <div slot="header">
         <!-- 自定义的面包屑组件 -->
-        <my-bread>发布文章</my-bread>
+        <my-bread>{{$route.query.id?'修改文章':'发布文章'}}</my-bread>
       </div>
 
       <el-form :model="articleFrom" label-width="120px">
@@ -40,8 +40,14 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button @click="submit(false)" type="primary">发布文章</el-button>
-          <el-button @click="submit(true)" type="primary" plain>存入草稿</el-button>
+          <div v-if="$route.query.id">
+            <el-button @click="update(false)" type="primary">修改文章</el-button>
+          </div>
+          <div v-else>
+            <el-button @click="submit(false)" type="primary">发布文章</el-button>
+            <el-button @click="submit(true)" type="primary" plain>存入草稿</el-button>
+          </div>
+
         </el-form-item>
       </el-form>
     </el-card>
@@ -91,9 +97,14 @@ export default {
     }
   },
   // 监听属性 类似于data概念
-  computed: {},
+  computed: {
+  },
   // 监控data中的数据变化
-  watch: {},
+  watch: {
+    '$route.query.id': function () {
+      this.toggleFormInfo()
+    }
+  },
   // 方法集合
   methods: {
 
@@ -106,10 +117,49 @@ export default {
       } catch (e) {
         this.$message.error(draft ? '存入草稿失败' : '发布文章失败')
       }
+    },
+    // 获取修改文章信息
+    async getArticle () {
+      try {
+        const res = await this.$http.get(`articles/${this.$route.query.id}`)
+        this.articleFrom = res.data.data
+      } catch (e) {
+        this.$message.error('获取信息失败')
+      }
+    },
+    // 切换表单信息
+    toggleFormInfo () {
+      if (this.$route.query.id) {
+        this.getArticle()
+      } else {
+        this.articleFrom = {
+          title: '', // 标题
+          channel_id: null, // 频道
+          content: '', // 文章内容
+          cover: { // 封面
+            type: 1, // 单图 三图
+            images: [] // 图片
+          }
+        }
+      }
+    },
+    // 修改文章
+    async update () {
+      try {
+        await this.$http.put(`articles/${this.articleFrom.id}?draft=false`, this.articleFrom)
+        this.$message.success('修改文章成功')
+        this.$router.push('article')
+      } catch (e) {
+        console.log(e)
+        this.$$message.error('修改文章失败')
+      }
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created () {
+    if (this.$route.query.id) {
+      this.getArticle()
+    }
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted () {

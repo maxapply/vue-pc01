@@ -150,12 +150,6 @@ export default {
         this.filterData.end_pubdate = null
       }
     },
-    // 监控频道列表清空
-    // changeChannel () {
-    //   if (this.filterData.channel_id === '') {
-    //     this.filterData.channel_id = null
-    //   }
-    // },
     // 跳转到编辑文章
     toEditicle (id) {
       this.$router.push(`/publish?id=${id}`)
