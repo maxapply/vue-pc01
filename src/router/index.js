@@ -8,6 +8,7 @@ import NotFound from '@/views/notfound'
 import Article from '@/views/article'
 import Publish from '@/views/publish'
 import Images from '@/views/image'
+import Comment from '@/views/comment'
 
 // 获取本地用户信息
 import auth from '@/utils/auth'
@@ -33,6 +34,10 @@ const routes = [
       {
         path: '/images',
         component: Images
+      },
+      {
+        path: '/comment',
+        component: Comment
       }
     ]
   },
