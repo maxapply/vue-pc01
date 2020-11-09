@@ -22,6 +22,7 @@
         </el-tab-pane>
 
         <el-tab-pane label="粉丝画像" name="pictrue">
+          <div style="width:600px;height:400px" ref="dom"></div>
 
         </el-tab-pane>
       </el-tabs>
@@ -33,7 +34,7 @@
 <script>
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》'
-
+import echarts from 'echarts'
 export default {
   name: 'app-fans',
   // import引入的组件需要注入到对象中才能使用
@@ -74,7 +75,47 @@ export default {
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted () {
-
+    const myChat = echarts.init(this.$refs.dom)
+    // 指定图表的配置项和数据
+    const option = {
+      color: ['#3398DB'],
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { // 坐标轴指示器，坐标轴触发有效
+          type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+        }
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+      },
+      xAxis: [
+        {
+          type: 'category',
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          axisTick: {
+            alignWithLabel: true
+          }
+        }
+      ],
+      yAxis: [
+        {
+          type: 'value'
+        }
+      ],
+      series: [
+        {
+          name: '直接访问',
+          type: 'bar',
+          barWidth: '60%',
+          data: [10, 52, 200, 334, 390, 330, 220]
+        }
+      ]
+    }
+    // 使用刚指定的配置项和数据显示图表。
+    myChat.setOption(option)
   },
   beforeCreate () { }, // 生命周期 - 创建之前
   beforeMount () { }, // 生命周期 - 挂载之前
