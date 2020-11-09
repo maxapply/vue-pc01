@@ -18,17 +18,18 @@
         </el-form-item>
 
         <el-form-item label="封面 : ">
-          <el-radio-group v-model="articleFrom.cover.type">
+          <el-radio-group @change="articleFrom.cover.images = []" v-model="articleFrom.cover.type">
             <el-radio :label="1">单图</el-radio>
             <el-radio :label="3">三图</el-radio>
             <el-radio :label="0">无图</el-radio>
             <el-radio :label="-1">自动</el-radio>
           </el-radio-group>
 
-          <div>
-            <my-image @input="articleFrom.iamge = $event"></my-image>
-            <my-image></my-image>
-            <my-image></my-image>
+          <div v-if="articleFrom.cover.type===1">
+            <my-image v-model="articleFrom.cover.images[0]"></my-image>
+          </div>
+          <div v-else-if="articleFrom.cover.type===3">
+            <my-image v-for="i in 3" :key="i" v-model="articleFrom.cover.images[i-1]"></my-image>
           </div>
 
         </el-form-item>
@@ -39,7 +40,8 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button type="success">发布文章</el-button>
+          <el-button @click="submit(false)" type="primary">发布文章</el-button>
+          <el-button @click="submit(true)" type="primary" plain>存入草稿</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -65,14 +67,12 @@ export default {
     return {
       articleFrom: {
         title: '', // 标题
-        resource: '', // 封面
         channel_id: null, // 频道
-        content: '',
-        cover: {
-          type: 1,
-          images: []
-        },
-        iamge: ''
+        content: '', // 文章内容
+        cover: { // 封面
+          type: 1, // 单图 三图
+          images: [] // 图片
+        }
       },
       editorOption: {
         placeholder: '',
@@ -97,14 +97,22 @@ export default {
   // 方法集合
   methods: {
 
+    // 发布文章  存入草稿
+    async submit (draft) {
+      try {
+        await this.$http.post(`articles?draft=${draft}`, this.articleFrom)
+        this.$message.success(draft ? '存入草稿成功' : '发布文章发成')
+        this.$router.push('article')
+      } catch (e) {
+        this.$message.error(draft ? '存入草稿失败' : '发布文章失败')
+      }
+    }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created () {
-
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted () {
-
   },
   beforeCreate () { }, // 生命周期 - 创建之前
   beforeMount () { }, // 生命周期 - 挂载之前

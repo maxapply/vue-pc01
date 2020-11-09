@@ -2,7 +2,7 @@
 <template>
   <div class='my-image'>
     <div class="img-btn" @click="openDialog">
-      <img src="../assets/images/addImg.png" alt="">
+      <img :src="value||imageBtn" alt="">
     </div>
 
     <el-dialog :visible.sync="dialogVisible" width="750px">
@@ -38,7 +38,7 @@
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="confirmImage">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -49,8 +49,11 @@
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》'
 import auth from '@/utils/auth'
+import addImg from '@/assets/images/addImg.png'
+
 export default {
   name: 'my-image',
+  props: ['value'],
   // import引入的组件需要注入到对象中才能使用
   components: {},
   data () {
@@ -70,7 +73,8 @@ export default {
       upLoadHeaders: {
         Authorization: `Bearer ${auth.getUser().token}`
       }, // 图片上传的请求头
-      imageUrl: '' // 图片
+      imageUrl: '', // 图片
+      imageBtn: addImg
     }
   },
   // 监听属性 类似于data概念
@@ -88,8 +92,11 @@ export default {
     },
     // 打开对话框
     openDialog () {
+      this.activeName = 'list' // 默认激活第一个选项卡
       this.dialogVisible = true // 显示对话框
       this.getImage() // 获取图片素材
+      this.selectedImage = ''
+      this.imageUrl = ''
     },
     // 获取图片信息
     async getImage () {
@@ -122,10 +129,21 @@ export default {
     handleSuccess (res, file) {
       this.$message.success('上传成功')
       this.imageUrl = res.data.url
-      this.$emit('input', this.imageUrl)
-      window.setTimeout(() => {
-        this.dialogVisible = false
-      }, 2000)
+    },
+    // 点击确认按钮
+    confirmImage () {
+      this.dialogVisible = false
+      if (this.activeName === 'list') {
+        if (!this.selectedImage) {
+          return this.$message.warning('请选择一张图片')
+        }
+        this.$emit('input', this.selectedImage)
+      } else {
+        if (!this.imageUrl) {
+          return this.$message.warning('请上传一张图片')
+        }
+        this.$emit('input', this.imageUrl)
+      }
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
@@ -167,7 +185,7 @@ export default {
   }
 
   &:hover {
-    border: 1px dashed #3366ff;
+    border: 1px dashed #5599ff;
   }
 }
 
