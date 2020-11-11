@@ -27,13 +27,13 @@
             </el-form-item>
 
             <el-form-item>
-              <el-button type="primary">保存设置</el-button>
+              <el-button type="primary" @click="saveSetting">保存设置</el-button>
             </el-form-item>
           </el-form>
 
         </el-col>
         <el-col :span="12">
-          <el-upload class="avatar-uploader" action="https://jsonplaceholder.typicode.com/posts/" :show-file-list="false">
+          <el-upload :http-request="upLoaderImage" class="avatar-uploader" action="" :show-file-list="false">
             <img v-if="user.photo" :src="user.photo" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
@@ -50,6 +50,7 @@
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》'
 import auth from '@/utils/auth'
+import eventBus from '@/eventBus'
 export default {
   name: 'app-setting',
   // import引入的组件需要注入到对象中才能使用
@@ -62,10 +63,10 @@ export default {
         intro: '',
         email: '',
         photo: ''
-      },
-      upLoadHeaders: {
-        Authorization: `Bearer ${auth.getUser().token}`
-      } // 图片上传的请求头
+      }
+      // upLoadHeaders: {
+      //   Authorization: `Bearer ${auth.getUser().token}`
+      // } // 图片上传的请求头
 
     }
   },
@@ -78,7 +79,35 @@ export default {
     async getUserInfo () {
       const res = await this.$http.get('user/profile')
       this.user = res.data.data
-      console.log(res)
+    },
+    // 修改用户信息
+    async saveSetting () {
+      const { name, intro, email } = this.user
+      await this.$http.patch('user/profile', { name, intro, email })
+      this.$message.success('修改信息成功')
+
+      const user = auth.getUser()
+      user.name = name
+      auth.setUser(user)
+      eventBus.$emit('updataUserName', name)
+    },
+    // 上传头像
+    async upLoaderImage ({ file }) {
+      try {
+        const fd = new FormData()
+        fd.append('photo', file)
+        const res = await this.$http.patch('user/photo', fd)
+        this.user.photo = res.data.data.photo
+
+        const user = auth.getUser()
+        user.photo = res.data.data.photo
+
+        auth.setUser(user)
+        eventBus.$emit('updataUserImage', res.data.data.photo)
+        this.$message.success('修改头像成功')
+      } catch (e) {
+        this.$message.error('修改头像失败')
+      }
     }
 
   },
